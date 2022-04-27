@@ -11,9 +11,9 @@ BG_karakter = pygame.image.load("Bg_Karakter.png")
 BG_karakter = pygame.transform.scale(BG_karakter,(1000, 650))
 karakter_pilihan=1
 
-#music = pygame.mixer.music.load('music.wav')
-#pygame.mixer.music.play(-1)
-
+#Music
+music = pygame.mixer.music.load('music.wav')
+pygame.mixer.music.play(-1)
 
 def main() :
     run=True
