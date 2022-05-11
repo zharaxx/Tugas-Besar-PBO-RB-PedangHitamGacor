@@ -91,12 +91,14 @@ BG_karakter = pygame.image.load("Bg_Karakter.png")
 BG_karakter = pygame.transform.scale(BG_karakter,(1000, 650))
 BG_info = pygame.image.load("Bg_info.png")
 BG_info = pygame.transform.scale(BG_info,(1000,650))
+BG_map = pygame.image.load('maps.png')
+BG_map = pygame.transform.scale(BG_map, (1000,650))
 karakter_pilihan=1
 music = pygame.mixer.music.load('Sound Gameplay.mp3')
 pygame.mixer.music.play(-1)
 button_sound = mixer.Sound('Sound Button.wav')
 
-icon = pygame.image.load("sword.png")
+icon = pygame.image.load("man.png")
 pygame.display.set_icon(icon)
 
 #on = pygame.image.load("on.png")
@@ -139,6 +141,10 @@ def info() :
     run = True
     while run :
         WIN.blit(BG_info, (0,0))
+        back_button=Button((90),(50),img=pygame.image.load("Back.png"),scale=0.4)
+        if back_button.draw(WIN) :
+            button_sound.play()
+            main()
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 run = False
@@ -146,6 +152,38 @@ def info() :
                 sys.exit()
         pygame.display.update()
     pygame.quit()
+
+def pause():
+
+    def message_to_screen(message, colour, size, pos):
+        font = pygame.font.Font('freesansbold.ttf',size)
+        text = font.render(message, True, colour)
+        WIN.blit(text, (text.get_rect(center = pos)))
+
+    paused = True
+    clock = pygame.time.Clock()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_p:
+                    paused = not paused
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+        if paused:
+            WIN.fill("orange")
+            message_to_screen("Paused", (0, 0, 0), 30, (500, 325))
+            message_to_screen("Press C to continue or Q to quit.", (0, 0, 0), 10, (500, 500))
+            pygame.display.update()
+            continue
+        else:
+            return 
+        pygame.display.update()
+        clock.tick(5)
 
 def main() :
     run=True
@@ -205,8 +243,9 @@ def play() :
                     player.up_pressed = False
                 if event.key == pygame.K_DOWN:
                     player.down_pressed = False
-        
-        WIN.fill("black")  
+                if event.key == pygame.K_p:
+                    pause()
+        WIN.blit(BG_map,(0,0))
         player.draw(WIN)
         player.update()
         pygame.display.flip()
