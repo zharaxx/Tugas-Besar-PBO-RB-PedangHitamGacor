@@ -1,20 +1,3 @@
-import pygame,sys
-
-pygame.init()
-Screen_WIDTH = 1000
-Screen_HEIGHT = 650
-WIN = pygame.display.set_mode((Screen_WIDTH,Screen_HEIGHT))
-pygame.display.set_caption("Hunter and Guardian")
-BG_main = pygame.image.load("Background.png")
-BG_main = pygame.transform.scale(BG_main, (1000, 650))
-BG_karakter = pygame.image.load("Bg_Karakter.png")
-BG_karakter = pygame.transform.scale(BG_karakter,(1000, 650))
-karakter_pilihan=1
-
-#Music
-music = pygame.mixer.music.load('music.wav')
-pygame.mixer.music.play(-1)
-
 def main() :
     run=True
     while run :
