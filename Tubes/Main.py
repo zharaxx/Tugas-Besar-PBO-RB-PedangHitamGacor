@@ -1,12 +1,74 @@
+from tkinter import Menu
+from turtle import width
 import pygame,sys
 from pygame import mixer
 
-class Karakter :
+# class Halangan(pygame.sprite.Sprite) :
+#     def __init__(self) -> None:
+#         super(Halangan, self).__init__()
+#     pass
+class RINTANGAN(pygame.sprite.Sprite):
+	def __init__(self, ukuran, posisi):
+		super(RINTANGAN, self).__init__()
+		self.surf = pygame.Surface(ukuran)
+		self.surf.fill((100, 100, 100))
+		self.rect = self.surf.get_rect()
+		self.rect.x, self.rect.y = posisi
+	def update(self, Layar):
+		Layar.blit(self.surf, self.rect)
+        
+class Maps():
     def __init__(self):
+        self.kotak = pygame.sprite.Group()
+        self.kotak1 = RINTANGAN((125, 60), (115, 95))
+        self.kotak2 = RINTANGAN((125,60), (115, 451))
+        self.kotak3 = RINTANGAN((125, 60), (760, 85))
+        self.kotak4 = RINTANGAN((125, 60), (757, 438))
+        self.kotak5 = RINTANGAN((65, 40),(146, 155))
+        self.kotak6 = RINTANGAN((65, 40),(146, 420))
+        self.kotak7 = RINTANGAN((65, 40),(791, 141))
+        self.kotak8 = RINTANGAN((65, 40),(789, 409))
+        self.kotak9 = RINTANGAN((61, 347), (310, 129))
+        self.kotak10 = RINTANGAN((61, 347), (630, 115))
+        self.kotak11 = RINTANGAN((65, 120),(469,38))
+        self.kotak12 = RINTANGAN((65, 120),(469,449))
+        self.kotak13 = RINTANGAN((125, 65), (438, 155))
+        self.kotak14 = RINTANGAN((125, 65), (438, 390))
+        self.kotak.add(self.kotak1, self.kotak2, self.kotak3, self.kotak4, self.kotak5,
+        self.kotak6, self.kotak7, self.kotak8, self.kotak9, self.kotak10, self.kotak11, self.kotak12,
+        self.kotak13, self.kotak14)
+    def tampil(self, screen):
+        self.kotak.update(screen)
+
+class Guardian(pygame.sprite.Sprite) :
+    def __init__(self,x,y) :
+        super(Guardian, self).__init__()
+        self.x=int(x)
+        self.y=int(y)
+        self.rect = pygame.Rect(self.x, self.y, 32, 32)
+        img=pygame.image.load("Assets\Gambar\Guardian.png")
+        width=img.get_width()
+        height=img.get_height()
+        self.image=pygame.transform.scale(img,((width*0.5),(height*0.5)))
+        self.a, self.b = self.x, self.y
+    def draw(self, screen) :
+        screen.blit(self.image,self.rect)
+    def update(self, rintangan) :
+        kena_rintangan = pygame.sprite.spritecollideany(self, rintangan)
+        if kena_rintangan:
+            self.x, self.y = self.a, self.b
+        else:
+            self.a, self.b = self.rect[:2]
+
+    
+
+class Karakter(pygame.sprite.Sprite) :
+    def __init__(self):
+        super(Karakter, self).__init_()
         pass
     def draw(self, screen):
         screen.blit(self.image,self.rect)
-    def update(self):
+    def update(self, rintangan, musuh):
         self.velX = 0
         self.velY = 0
         if self.left_pressed and not self.right_pressed:
@@ -20,13 +82,30 @@ class Karakter :
         self.x += self.velX
         self.y += self.velY
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
+        if self.x <= 50 :
+            self.x = 50
+        if self.x >= 924 :
+            self.x = 924
+        if self.y <=40 :
+            self.y = 40
+        if self.y >= 535 :
+            self.y = 535
+        kena_rintangan = pygame.sprite.spritecollideany(self, rintangan)
+        kena_musuh = pygame.sprite.spritecollideany(self, musuh)
+        if kena_rintangan:
+            self.x, self.y = self.a, self.b
+        else:
+            self.a, self.b = self.rect[:2]
+        if kena_musuh:
+            main()
+            
 
 class Male(Karakter) :
     def __init__(self, x, y):
         self.x = int(x)
         self.y = int(y)
         self.rect = pygame.Rect(self.x, self.y, 32, 32)
-        img=pygame.image.load("Man.png")
+        img=pygame.image.load("Assets\Gambar\Man.png")
         width = img.get_width()
         height = img.get_height()
         self.image = pygame.transform.scale(img,((width*0.2),(height*0.2)))
@@ -36,14 +115,15 @@ class Male(Karakter) :
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
-        self.speed = 4
+        self.speed = 5
+        self.a, self.b = self.x, self.y
 
 class Female(Karakter) :
     def __init__(self, x, y):
         self.x = int(x)
         self.y = int(y)
         self.rect = pygame.Rect(self.x, self.y, 32, 32)
-        img=pygame.image.load("Girl.png")
+        img=pygame.image.load("Assets\Gambar\Girl.png")
         width = img.get_width()
         height = img.get_height()
         self.image = pygame.transform.scale(img,((width*0.2),(height*0.2)))
@@ -65,18 +145,17 @@ class Button :
         self.img_rect=self.img.get_rect(center=(self.pos_x,self.pos_y))
         self.clicked=False
 
-    def draw (self,screen) :
-        action=False
+    def draw (self) :
         pos = pygame.mouse.get_pos()
         if self.img_rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False :
+            if pygame.mouse.get_pressed()[0] and not self.clicked:
                 self.clicked = True
-                action = True
-        if pygame.mouse.get_pressed()[0] == 0:
+                return True
+        if not pygame.mouse.get_pressed()[0] and self.clicked:
             self.clicked = False
+        return False
+    def show(self, screen):
         screen.blit(self.img,self.img_rect) 
-        return action
-    
     def update_image(self, img):
         self.image = pygame.transform.scale(img,self.scale)
 
@@ -85,73 +164,57 @@ Screen_WIDTH = 1000
 Screen_HEIGHT = 650
 WIN = pygame.display.set_mode((Screen_WIDTH,Screen_HEIGHT))
 pygame.display.set_caption("Hunter and Guardian")
-BG_main = pygame.image.load("Background.png")
+BG_main = pygame.image.load("Assets\Gambar\Background.png")
 BG_main = pygame.transform.scale(BG_main, (1000, 650))
-BG_karakter = pygame.image.load("Bg_Karakter.png")
+BG_karakter = pygame.image.load("Assets\Gambar\Bg_Karakter.png")
 BG_karakter = pygame.transform.scale(BG_karakter,(1000, 650))
-BG_info = pygame.image.load("Bg_info.png")
+BG_info = pygame.image.load("Assets\Gambar\Bg_info.png")
 BG_info = pygame.transform.scale(BG_info,(1000,650))
-BG_map = pygame.image.load('maps.png')
+BG_map = pygame.image.load('Assets\Gambar\maps.png')
 BG_map = pygame.transform.scale(BG_map, (1000,650))
 karakter_pilihan=1
-music = pygame.mixer.music.load('Sound Gameplay.mp3')
+music = pygame.mixer.music.load('Assets\Audio\Sound Gameplay.mp3')
 pygame.mixer.music.play(-1)
-button_sound = mixer.Sound('Sound Button.wav')
+button_sound = mixer.Sound('Assets\Audio\Sound Button.wav')
 
-icon = pygame.image.load("man.png")
+icon = pygame.image.load("Assets\Gambar\Man.png")
 pygame.display.set_icon(icon)
-
-#on = pygame.image.load("on.png")
-#off = pygame.image.load("off.png")
-#sound_btn=Button(50,(Screen_HEIGHT-50), scale=0.15)
-
-#sound_on = True
-
-#running = True
-#while running:
-    #if sound_btn.draw(WIN):
-        #sound_on = not sound_on
-        #if sound_on:
-            #sound_btn.update_image(on)
-        #else:
-            #sound_btn.update_image(off)
 
 def karakter() :
     global karakter_pilihan
+    male_button=Button(((Screen_WIDTH/2)-200),((Screen_HEIGHT/2)+100),img=pygame.image.load("Assets\Gambar\Hunter_Man.png"),scale=(0.5))
+    female_button=Button(((Screen_WIDTH/2)+200),((Screen_HEIGHT/2)+100),img=pygame.image.load("Assets\Gambar\Hunter_Girl.png"),scale=(0.5))
     run = True
     while run :
         WIN.blit(BG_karakter, (0,0))
-        male_button=Button(((Screen_WIDTH/2)-200),((Screen_HEIGHT/2)+100),img=pygame.image.load("Hunter_Man.png"),scale=(0.5))
-        if male_button.draw(WIN) :
+        male_button.show(WIN)
+        female_button.show(WIN)
+        if male_button.draw() :
             karakter_pilihan=1
             main()
-        female_button=Button(((Screen_WIDTH/2)+200),((Screen_HEIGHT/2)+100),img=pygame.image.load("Hunter_Girl.png"),scale=(0.5))
-        if female_button.draw(WIN) :
+        if female_button.draw() :
             karakter_pilihan=2
             main()
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 run = False
-                pygame.quit()
                 sys.exit()
         pygame.display.update()
-    pygame.quit()
 
 def info() :
+    back_button=Button((90),(50),img=pygame.image.load("Assets\Gambar\Back.png"),scale=0.4)
     run = True
     while run :
         WIN.blit(BG_info, (0,0))
-        back_button=Button((90),(50),img=pygame.image.load("Back.png"),scale=0.4)
-        if back_button.draw(WIN) :
+        back_button.show(WIN)
+        if back_button.draw() :
             button_sound.play()
             main()
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 run = False
-                pygame.quit()
                 sys.exit()
         pygame.display.update()
-    pygame.quit()
 
 def pause():
 
@@ -187,27 +250,41 @@ def pause():
 
 def main() :
     run=True
+    music = True
+    start_button=Button(((Screen_WIDTH/2)-300),((Screen_HEIGHT/2)+200),img=pygame.image.load("Assets\Gambar\Mulai.png"),scale=0.6)
+    karakter_button=Button((Screen_WIDTH/2),((Screen_HEIGHT/2)+200),img=pygame.image.load("Assets\Gambar\Karakter.png"), scale=0.6)
+    exit_button=Button(((Screen_WIDTH/2)+300),((Screen_HEIGHT/2)+200),img=pygame.image.load("Assets\Gambar\Exit.png"), scale=0.6)
+    info_button=Button((Screen_WIDTH-50),(Screen_HEIGHT-50),img=pygame.image.load("Assets\Gambar\Info.png"), scale=0.5)
+    on_button=Button(50,(Screen_HEIGHT-50),img=pygame.image.load("Assets\Gambar\Audio.png"), scale=0.5)
+    off_button=Button(50,(Screen_HEIGHT-50),img=pygame.image.load("Assets\Gambar\off.png"), scale=0.15)
     while run :
         WIN.blit(BG_main,(0,0))
-        start_button=Button(((Screen_WIDTH/2)-300),((Screen_HEIGHT/2)+200),img=pygame.image.load("Mulai.png"),scale=0.6)
-        if start_button.draw(WIN) :
+        start_button.show(WIN)
+        karakter_button.show(WIN)
+        exit_button.show(WIN)
+        info_button.show(WIN)
+        if music:
+            on_button.show(WIN)
+        else:
+            off_button.show(WIN)
+        if start_button.draw() :
             button_sound.play()
             play()
-        karakter_button=Button((Screen_WIDTH/2),((Screen_HEIGHT/2)+200),img=pygame.image.load("Karakter.png"), scale=0.6)
-        if karakter_button.draw(WIN) :
+        if karakter_button.draw() :
             button_sound.play()
             karakter()
-        exit_button=Button(((Screen_WIDTH/2)+300),((Screen_HEIGHT/2)+200),img=pygame.image.load("Exit.png"), scale=0.6)
-        if exit_button.draw(WIN) :
+        if exit_button.draw() :
             button_sound.play()
             run=False
-        info_button=Button((Screen_WIDTH-50),(Screen_HEIGHT-50),img=pygame.image.load("Info.png"), scale=0.5)
-        if info_button.draw(WIN) :
+        if info_button.draw() :
             button_sound.play()
             info()
-        on_button=Button(50,(Screen_HEIGHT-50),img=pygame.image.load("audio.png"), scale=0.5)
-        if on_button.draw(WIN) :
-            button_sound.play()
+        if music:
+            if on_button.draw():
+                music = False
+        else:
+            if off_button.draw():
+                music = True
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 run = False
@@ -215,6 +292,9 @@ def main() :
     pygame.quit()
 
 def play() :
+    halangan=Maps()
+    musuh=pygame.sprite.Group()
+    musuh.add(Guardian(905,56),Guardian(891,517),Guardian(57,53),Guardian(73,516))
     clock=pygame.time.Clock()
     if (karakter_pilihan==1) :
         player = Male((Screen_WIDTH/2),(Screen_HEIGHT/2))
@@ -225,6 +305,8 @@ def play() :
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if pygame.mouse.get_pressed()[0] == 1:
+                print(pygame.mouse.get_pos())
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     player.left_pressed = True
@@ -247,8 +329,10 @@ def play() :
                     pause()
         WIN.blit(BG_map,(0,0))
         player.draw(WIN)
-        player.update()
+        player.update(halangan.kotak,musuh)
+        for i in musuh :
+            i.draw(WIN)
         pygame.display.flip()
-        clock.tick(120)
+        clock.tick(30)
 
 main()
