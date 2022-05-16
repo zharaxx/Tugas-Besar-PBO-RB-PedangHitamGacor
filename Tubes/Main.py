@@ -1,6 +1,8 @@
+from re import X
 from tkinter import Menu
-from turtle import width
+from turtle import speed, width
 import pygame,sys
+import random
 from pygame import mixer
 
 # class Halangan(pygame.sprite.Sprite) :
@@ -43,24 +45,45 @@ class Maps():
 class Guardian(pygame.sprite.Sprite) :
     def __init__(self,x,y) :
         super(Guardian, self).__init__()
-        self.x=int(x)
-        self.y=int(y)
-        self.rect = pygame.Rect(self.x, self.y, 32, 32)
+        # self.x=int(x)
+        # self.y=int(y)
+        # self.rect = pygame.Rect(self.x, self.y, 32, 32)
         img=pygame.image.load("Assets\Gambar\Guardian.png")
         width=img.get_width()
         height=img.get_height()
         self.image=pygame.transform.scale(img,((width*0.5),(height*0.5)))
-        self.a, self.b = self.x, self.y
+        self.rect = self.image.get_rect(center = (x, y))
+        self.a, self.b = x, y
+        self.speed = 1
+        self.arah = 'x'
+        self.acak = random.choice([-1, 1])
     def draw(self, screen) :
         screen.blit(self.image,self.rect)
-    def update(self, rintangan) :
+    def update(self, rintangan, karakter) :
+        kena = False
+        if self.rect.x <= 50 :
+            self.rect.x = 50
+            kena = True
+        if self.rect.x >= 924 :
+            self.rect.x = 924
+            kena = True
+        if self.rect.y <=40 :
+            self.rect.y = 40
+            kena = True
+        if self.rect.y >= 535 :
+            self.rect.y = 535
+            kena = True
         kena_rintangan = pygame.sprite.spritecollideany(self, rintangan)
-        if kena_rintangan:
-            self.x, self.y = self.a, self.b
+        if kena_rintangan or kena:
+            self.rect.x, self.rect.y = self.a, self.b
+            self.arah = random.choice(["x", "y"])
+            self.acak = random.choice([-1, 1])
         else:
             self.a, self.b = self.rect[:2]
-
-    
+            if self.arah == 'x':
+                self.rect.x = self.rect.x + (self.acak * self.speed)
+            elif self.arah == 'y':
+                self.rect.y = self.rect.y + (self.acak * self.speed)
 
 class Karakter(pygame.sprite.Sprite) :
     def __init__(self):
@@ -330,6 +353,7 @@ def play() :
         WIN.blit(BG_map,(0,0))
         player.draw(WIN)
         player.update(halangan.kotak,musuh)
+        musuh.update(halangan.kotak, player)
         for i in musuh :
             i.draw(WIN)
         pygame.display.flip()
