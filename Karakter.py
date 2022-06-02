@@ -45,7 +45,7 @@ class Karakter(pygame.sprite.Sprite) :
             dead()
         if kena_koin :
             self.score+=1
-            if self.score%1==0 and self.score !=0 :
+            if self.score%3==0 and self.score !=0 :
                 tipe_item=random.randint(1,2)
                 if tipe_item == 1 :
                     potion.add(invicible())
