@@ -1,6 +1,6 @@
 TIM RB-09, PEDANG HITAM GACOR
 ![Img 1](Judul.png)
-====================================================
+=====================================================
 
 ## Nama dan NIM Anggota Kelompok
 | Nama | NIM | Kelas | Akun Git |
@@ -12,7 +12,7 @@ TIM RB-09, PEDANG HITAM GACOR
 | Rafi Ramadhan Pratama             | 120140079 | RB | zharaxx         |
 | Arum Rahmawati                    | 120140085 | RB | arumrhm         |
 
-====================================================
+=====================================================
 
 **About Game** :
 
