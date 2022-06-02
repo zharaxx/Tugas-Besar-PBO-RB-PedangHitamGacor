@@ -1,0 +1,21 @@
+import pygame
+pygame.mixer.init()
+BG_main = pygame.image.load("Assets/Gambar/Background.png")
+BG_main = pygame.transform.scale(BG_main, (1000, 650))
+BG_karakter = pygame.image.load("Assets/Gambar/Bg_Karakter.png")
+BG_karakter = pygame.transform.scale(BG_karakter,(1000, 650))
+BG_info = pygame.image.load("Assets/Gambar/Bg_info.png")
+BG_info = pygame.transform.scale(BG_info,(1000,650))
+BG_map = pygame.image.load('Assets/Gambar/maps.png')
+BG_map = pygame.transform.scale(BG_map, (1000,650))
+BG_dead = pygame.image.load('Assets/Gambar/Bg_dead.png')
+BG_dead = pygame.transform.scale(BG_dead, (1000,650))
+karakter_pilihan=1
+skor=0
+music = pygame.mixer.music.load('Assets/Audio/Sound Gameplay.mp3')
+pygame.mixer.music.play(-1)
+button_sound = pygame.mixer.Sound('Assets/Audio/Sound Button.wav')
+coin_sound = pygame.mixer.Sound('Assets/Audio/Sound Koin.mp3')
+invicible_sound = pygame.mixer.Sound('Assets/Audio/Sound Invicible.wav')
+freeze_sound = pygame.mixer.Sound('Assets/Audio/Sound Freeze.mp3')
+dead_sound = pygame.mixer.Sound('Assets/Audio/Sound Game Over.mp3')
