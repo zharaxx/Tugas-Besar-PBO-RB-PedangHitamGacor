@@ -21,4 +21,5 @@ TIM RB-09, PEDANG HITAM GACOR
 =====================================================
 
 ![Img 1](Man.png)   ![Img 1](Guardian.png)  ![Img 1](Girl.png)
+
         MAN                 GUARDIAN                GIRL
